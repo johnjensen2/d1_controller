@@ -4,12 +4,9 @@
 #include <ArduinoOTA.h>
 #include <LittleFS.h>
 
-
+#include "secrets.h"
 #include "codes.h"
 
-// Replace with your WiFi credentials
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
 
 // Serial port to S3
 #define S3_SERIAL Serial
@@ -109,7 +106,7 @@ void setup() {
   S3_SERIAL.begin(S3_BAUD);
   delay(500);
 
-  WiFi.begin(ssid, password);
+ WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(300);
   }

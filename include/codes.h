@@ -61,12 +61,12 @@
 // Command Strings (for web/console UI triggers)
 // ----------------------------------------
 
-static const char* CMD_STR_ARE_YOU_THERE    = "areyou";
-static const char* CMD_STR_EMERGENCY_STOP   = "estop";
-static const char* CMD_STR_OVERRIDE_ON      = "override_on";
-static const char* CMD_STR_OVERRIDE_OFF     = "override_off";
-static const char* CMD_STR_SEND_SENSOR_DATA = "sensordata";
-static const char* CMD_STR_LORA_PREFIX      = "lora";
+[[maybe_unused]] static const char* CMD_STR_ARE_YOU_THERE    = "areyou";
+[[maybe_unused]] static const char* CMD_STR_EMERGENCY_STOP   = "estop";
+[[maybe_unused]] static const char* CMD_STR_OVERRIDE_ON      = "override_on";
+[[maybe_unused]] static const char* CMD_STR_OVERRIDE_OFF     = "override_off";
+[[maybe_unused]] static const char* CMD_STR_SEND_SENSOR_DATA = "sensordata";
+[[maybe_unused]] static const char* CMD_STR_LORA_PREFIX      = "lora";
 
 // ----------------------------------------
 // Data Structures
