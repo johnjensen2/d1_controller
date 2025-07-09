@@ -2,8 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoOTA.h>
-#include <LittleFS.h>
 
+#include "webui.h"
 #include "secrets.h"
 #include "codes.h"
 
@@ -27,37 +27,50 @@ void sendLoRaCommand(const String &msg) {
   S3_SERIAL.println(">");
 }
 
+void handleCommand(const String& cmd) {
+  Serial.print("[handleCommand] Received cmd: ");
+  Serial.println(cmd);
+
+  if (cmd == "areyou") {
+    Serial.println("Reply: Yes, I am here.");
+  } else if (cmd == "estop") {
+    Serial.println("EMERGENCY STOP triggered!");
+    // Insert emergency stop logic here
+  } else if (cmd == "override_on") {
+    Serial.println("Override enabled.");
+    // Insert override enable logic here
+  } else if (cmd == "override_off") {
+    Serial.println("Override disabled.");
+    // Insert override disable logic here
+  } else if (cmd == "sensordata") {
+    Serial.println("Sending sensor data...");
+    // Insert sensor data send logic here
+  } else {
+    Serial.println("Unknown command.");
+  }
+}
 
 // ============ Web Requests =============
 void setupWeb() {
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/index.html", "text/html");
-  });
+server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send_P(200, "text/html", index_html);
+});
 
-server.on("/cmd", HTTP_POST, [](AsyncWebServerRequest *request) {
-  if (request->hasParam("cmd", true)) {
-    String cmd = request->getParam("cmd", true)->value();
+server.on("/cmd", HTTP_GET, [](AsyncWebServerRequest *request){
+  String cmd = request->getParam("x")->value();
+  Serial.println("[CMD] " + cmd);
+  handleCommand(cmd);  // your internal command processor
+  request->send(200, "text/plain", "Executed: " + cmd);
+});
 
-    if (cmd == CMD_STR_ARE_YOU_THERE) {
-      sendCommand(CMD_ARE_YOU_THERE);
-      request->send(200, "text/plain", "Sent: Are You There?");
-    } else if (cmd == CMD_STR_EMERGENCY_STOP) {
-      sendCommand(CMD_EMERGENCY_STOP);
-      request->send(200, "text/plain", "Sent: Emergency Stop");
-    } else if (cmd == CMD_STR_SEND_SENSOR_DATA) {
-      sendCommand(CMD_SEND_SENSOR_DATA);
-      request->send(200, "text/plain", "Sent: Sensor Data Request");
-    } else {
-      request->send(400, "text/plain", "Unknown command");
-    }
-  } else if (request->hasParam("lora", true)) {
+server.on("/cmd", HTTP_POST, [](AsyncWebServerRequest *request){
+  if (request->hasParam("lora", true)) {
     String msg = request->getParam("lora", true)->value();
-    Serial.print("<LORA:");
-    Serial.print(msg);
-    Serial.println(">");
-    request->send(200, "text/plain", "LoRa message sent: " + msg);
+    Serial.println("[LoRa POST] " + msg);
+   sendLoRaCommand(msg);  // your implementation
+    request->send(200, "text/plain", "LoRa Sent: " + msg);
   } else {
-    request->send(400, "text/plain", "No valid parameters");
+    request->send(400, "text/plain", "Missing lora parameter");
   }
 });
 
@@ -111,9 +124,6 @@ void setup() {
     delay(300);
   }
 
- if (!LittleFS.begin()) {
-    Serial.println("LittleFS mount failed");
-  }
 
   setupOTA();
   setupWeb();
@@ -124,4 +134,7 @@ void setup() {
 // ============ Loop =============
 void loop() {
   ArduinoOTA.handle();
+
+
+  delay(1000);
 }
