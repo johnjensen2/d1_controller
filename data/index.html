@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>R.O.V.E.R. Override</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    button, input[type=text], form { font-size: 1.2em; margin: 10px; }
+    input[type=text] { padding: 6px; width: 300px; }
+  </style>
+</head>
+<body>
+  <h1>R.O.V.E.R. Override Control</h1>
+
+  <button onclick="sendCmd('areyou')">Are You There?</button><br>
+  <button onclick="sendCmd('estop')">EMERGENCY STOP</button><br>
+  <button onclick="sendCmd('sensordata')">Send Sensor Data</button><br>
+
+  <form onsubmit="sendLoRa(event)">
+    <input type="text" id="loraMsg" placeholder="Message to send over LoRa" required>
+    <button type="submit">Send LoRa Message</button>
+  </form>
+
+  <form onsubmit="sendLoRa(event)">
+  <input type="text" id="loraMsg" placeholder="Enter LoRa message" required>
+  <button type="submit">Send LoRa Message</button>
+</form>
+
+  <script>
+    function sendCmd(cmd) {
+      fetch('/cmd', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'cmd=' + encodeURIComponent(cmd)
+      }).then(res => res.text())
+        .then(text => alert(text))
+        .catch(() => alert('Error sending command'));
+    }
+
+ script>
+  function sendLoRa(e) {
+    e.preventDefault();
+    const msg = document.getElementById('loraMsg').value;
+    fetch('/cmd', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: 'lora=' + encodeURIComponent(msg)
+    })
+    .then(res => res.text())
+    .then(txt => alert(txt))
+    .catch(err => alert("Error sending LoRa: " + err));
+  }
+  </script>
+
+
+</body>
+</html>
